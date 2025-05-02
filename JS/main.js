@@ -25,7 +25,8 @@ function addNote() {
     const note = {
         title: title,
         description: description,
-        date: formattedDate
+        date: formattedDate,
+        important: false
     };
 
     let notes = JSON.parse(localStorage.getItem("notes")) || [];
@@ -39,23 +40,51 @@ function addNote() {
     hideForm();
 }
 
-function displayNotes() {
+function deleteNote(index) {
+    let notes = JSON.parse(localStorage.getItem("notes")) || [];
+    notes.splice(index, 1); 
+    localStorage.setItem("notes", JSON.stringify(notes)); 
+    displayNotes(); 
+}
+
+function toggleImportant(index) {
+    let notes = JSON.parse(localStorage.getItem("notes")) || [];
+    notes[index].important = !notes[index].important;
+    localStorage.setItem("notes", JSON.stringify(notes));
+    displayNotes();
+}
+
+
+
+function displayNotes(showImportantOnly = false) {
     const notesContainer = document.getElementById("notesContainer");
     let notes = JSON.parse(localStorage.getItem("notes")) || [];
 
-    notesContainer.innerHTML = ""; 
+    notesContainer.innerHTML = "";
 
-    notes.forEach(note => {
+    notes.forEach((note, index) => {
+        if (showImportantOnly && !note.important) return;
+
         const noteElement = document.createElement("div");
         noteElement.className = "note";
         noteElement.innerHTML = `
             <h4>${note.title}</h4>
             <p>${note.description}</p>
             <small>${note.date}</small>
-    `;
-    notesContainer.appendChild(noteElement);
+            <div class="note-actions">
+                <button class="deleteBtn" onclick="deleteNote(${index})">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+                <button class="starBtn" onclick="toggleImportant(${index})">
+                    <i class="fa${note.important ? 's' : 'r'} fa-star"></i>
+                </button>
+    </div>
+`;
+
+        notesContainer.appendChild(noteElement);
     });
 }
+
 
 window.onload = displayNotes;
 
