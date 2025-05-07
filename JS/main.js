@@ -20,7 +20,7 @@ function addNote() {
     }
 
     const now = new Date();
-    const formattedDate = now.toLocaleString(); // 22/4/2025
+    const formattedDate = now.toLocaleString();
 
     const note = {
         title: title,
@@ -33,19 +33,28 @@ function addNote() {
     notes.push(note);
     localStorage.setItem("notes", JSON.stringify(notes));
 
-    displayNotes(); // Re-render the notes
+    displayNotes(); // Re-render notes
 
+    // Clear inputs
     document.getElementById("title").value = "";
     document.getElementById("description").value = "";
+    
+    // Focus on the title input field after adding the note
+    document.getElementById("title").focus();
+
     hideForm();
 }
 
+
 function deleteNote(index) {
-    let notes = JSON.parse(localStorage.getItem("notes")) || [];
-    notes.splice(index, 1); 
-    localStorage.setItem("notes", JSON.stringify(notes)); 
-    displayNotes(); 
+    if (confirm("Are you sure you want to delete this note?")) {
+        let notes = JSON.parse(localStorage.getItem("notes")) || [];
+        notes.splice(index, 1);
+        localStorage.setItem("notes", JSON.stringify(notes));
+        displayNotes(); // Re-render notes after deletion
+    }
 }
+
 
 function toggleImportant(index) {
     let notes = JSON.parse(localStorage.getItem("notes")) || [];
@@ -59,7 +68,6 @@ function toggleImportant(index) {
 function displayNotes(showImportantOnly = false) {
     const notesContainer = document.getElementById("notesContainer");
     let notes = JSON.parse(localStorage.getItem("notes")) || [];
-
     notesContainer.innerHTML = "";
 
     notes.forEach((note, index) => {
@@ -72,18 +80,18 @@ function displayNotes(showImportantOnly = false) {
             <p>${note.description}</p>
             <small>${note.date}</small>
             <div class="note-actions">
-                <button class="deleteBtn" onclick="deleteNote(${index})">
+                <button class="deleteBtn" onclick="deleteNote(${index})" title="Delete Note">
                     <i class="fa-solid fa-trash"></i>
                 </button>
-                <button class="starBtn" onclick="toggleImportant(${index})">
+                <button class="starBtn" onclick="toggleImportant(${index})" title="Mark Note as Important">
                     <i class="fa${note.important ? 's' : 'r'} fa-star"></i>
                 </button>
-    </div>
-`;
-
+            </div>
+        `;
         notesContainer.appendChild(noteElement);
     });
 }
+
 
 
 window.onload = displayNotes;
